@@ -1,0 +1,16 @@
+(ns translation-reader.main
+  (:require
+   ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]))
+
+(defn main []
+  (m/runApp
+   (m/MaterialApp
+    .title "Welcome to Flutter"
+    .theme (m/ThemeData .primarySwatch m.Colors/blue
+                        .fontFamily "MongolianBaiZheng")
+    .home (m/Scaffold
+           .body
+           (m/Center
+            .child (mgl/MongolText "Hello World!")))
+    .debugShowCheckedModeBanner false)))
