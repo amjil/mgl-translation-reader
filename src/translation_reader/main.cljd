@@ -1,9 +1,27 @@
 (ns translation-reader.main
   (:require
    ["package:flutter/material.dart" :as m]
-   ["package:mongol/mongol.dart" :as mgl]))
+   ["package:mongol/mongol.dart" :as mgl]
+   ["package:flutter_dotenv/flutter_dotenv.dart" :as dotenv]
+   ["package:window_manager/window_manager.dart" :as wm]))
 
 (defn main []
+  (m.WidgetsFlutterBinding/ensureInitialized)
+  (await (.load dotenv/dotenv .fileName ".env"))
+  (await (wm.windowManager/ensureInitialized))
+  
+  (let [options (wm/WindowOptions
+                 .size (m/Size 800 600)
+                 .center true
+                 .backgroundColor m.Colors/transparent
+                 .skipTaskbar false
+                 .titleBarStyle wm.TitleBarStyle/hidden)]
+    (wm.windowManager/waitUntilReadyToShow
+     options 
+     ^:async (fn []
+               (await (wm.windowManager/show))
+               (await (wm.windowManager/focus)))))
+
   (m/runApp
    (m/MaterialApp
     .title "Welcome to Flutter"
