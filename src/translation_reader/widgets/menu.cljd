@@ -1,0 +1,35 @@
+(ns translation-reader.widgets.menu
+  (:require 
+   ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]
+   [cljd.flutter :as f]))
+   
+(defn view []
+  (f/widget
+   (m/Padding 
+    .padding (m.EdgeInsets/only .left 10))
+   (m/Column
+    .children
+    [(m/CircleAvatar
+      .radius 18
+      .backgroundColor m.Colors/blueAccent)
+     (m/SizedBox .height 10)
+     (mgl/MongolTextButton
+      .onPressed (fn [] (dart:core/print "xxxx"))
+      .child
+      (mgl/MongolText "ᠣᠩᠰᠢᠬᠤ"))
+     (mgl/MongolTextButton
+      .onPressed (fn [] (dart:core/print "xxxx"))
+      .child
+      (mgl/MongolText "ᠪᠢᠴᠢᠬᠦ"))
+     (m/SizedBox .height 10)
+     (mgl/MongolTextButton
+      .onPressed (fn [] (dart:core/print "xxxx"))
+      .child
+      (mgl/MongolText "ᠦᠭᠡᠰ"))
+     (m/SizedBox .height 10)
+     (mgl/MongolTextButton
+      .onPressed (fn [] (dart:core/print "xxxx"))
+      .child
+      (mgl/MongolText " ᠲᠣᠬᠢᠷᠠᠭᠤᠯᠤᠯᠲᠠ"))
+     ])))
