@@ -1,0 +1,92 @@
+(ns translation-reader.utils.themes
+  (:require 
+   ["package:flutter/material.dart" :as m]
+   ["package:adaptive_theme/adaptive_theme.dart" :as adaptive]
+   [translation-reader.services.pref :as pref]))
+   
+(declare light-theme light-theme)
+
+(defn set-dark [ctx]
+  (pref/set-int "theme-setting" 1)
+  (-> adaptive/AdaptiveTheme
+      (.of ctx)
+      .setDark))
+
+(defn set-light [ctx]
+  (pref/set-int "theme-setting" 0)
+  (-> adaptive/AdaptiveTheme
+      (.of ctx)
+      .setLight))
+
+(defn set-system [ctx]
+  (pref/set-int "theme-setting" 2)
+  (-> adaptive/AdaptiveTheme
+      (.of ctx)
+      .setSystem))
+
+(defn is-dark-mode [ctx]
+  (= (-> m/Theme
+         (.of ctx)
+         .-brightness)
+     m.Brightness/dark))
+
+(defn initial-theme []
+  (let [theme-setting (await (pref/get-int "theme-setting"))]
+    (cond
+      (nil? theme-setting)
+      ;; adaptive.AdaptiveThemeMode/system
+      adaptive.AdaptiveThemeMode/dark
+
+      :else
+      (condp = theme-setting
+        0 adaptive.AdaptiveThemeMode/light
+        1 adaptive.AdaptiveThemeMode/dark
+        adaptive.AdaptiveThemeMode/system))))
+
+(def light-theme 
+  (m/ThemeData
+   .fontFamily "MongolianBaiZheng"
+   .scaffoldBackgroundColor (-> m/Colors .white)
+   .colorScheme
+   (.light m/ColorScheme
+           .primary m.Colors/black
+           .onPrimary m.Colors/black
+           .outlineVariant (-> m/Colors .yellowAccent .-shade400)
+           .secondary m.Colors/red
+           .tertiary (-> m/Colors .blueGrey .-shade600)
+           .primaryContainer (-> m/Colors .blueGrey .-shade50)
+           .secondaryContainer (-> m/Colors .blueGrey .-shade100)
+           .tertiaryContainer (-> m/Colors .grey .-shade200)
+           .onTertiaryContainer (-> m/Colors .blue .-shade800 (.withOpacity 0.4)))
+   .cardTheme (m/CardTheme .color (-> m/Colors .white))
+   .iconTheme (m/IconThemeData .color (-> m/Colors .blueGrey .-shade600))
+;;    .textTheme (m/TextTheme
+;;                .titleMedium (m/TextStyle .color m.Colors/white
+;;                                          .fontSize 20.0)
+;;                .bodyText1 (m/TextStyle .color m.Colors/white70
+;;                                        .fontSize 18.0))
+   ))
+
+(def dark-theme
+  (m/ThemeData
+   .fontFamily "MongolianBaiZheng"
+   .scaffoldBackgroundColor (-> m/Colors .black45)
+   .colorScheme
+   (.dark m/ColorScheme
+          .primary m.Colors/blueGrey
+          .onPrimary m.Colors/white
+          .outlineVariant (-> m/Colors .yellowAccent)
+          .secondary m.Colors/red
+          .tertiary (-> m/Colors .black45)
+          .primaryContainer (-> m/Colors .grey .-shade900)
+          .secondaryContainer (-> m/Colors .grey .-shade800)
+          .tertiaryContainer (-> m/Colors .grey .-shade700)
+          .onTertiaryContainer (-> m/Colors .blue .-shade800 (.withOpacity 0.4)))
+   .cardTheme (m/CardTheme .color m.Colors/blueGrey)
+   .iconTheme (m/IconThemeData .color (-> m/Colors .yellowAccent .-shade700))
+;;    .textTheme (m/TextTheme
+;;                .titleMedium (m/TextStyle .color m.Colors/white
+;;                                        .fontSize 20.0)
+;;                .bodyText1 (m/TextStyle .color m.Colors/white70
+;;                                          .fontSize 18.0))
+   ))

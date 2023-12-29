@@ -3,13 +3,15 @@
    ["package:flutter/material.dart" :as m]
    ["package:mongol/mongol.dart" :as mgl]
    ["package:flutter_dotenv/flutter_dotenv.dart" :as dotenv]
-   ["package:window_manager/window_manager.dart" :as wm]))
+   ["package:adaptive_theme/adaptive_theme.dart" :as adaptive]
+   ["package:window_manager/window_manager.dart" :as wm]
+   [translation-reader.utils.themes :as themes]))
 
 (defn main []
   (m.WidgetsFlutterBinding/ensureInitialized)
   (await (.load dotenv/dotenv .fileName ".env"))
   (await (wm.windowManager/ensureInitialized))
-  
+
   (let [options (wm/WindowOptions
                  .size (m/Size 800 600)
                  .center true
@@ -17,18 +19,24 @@
                  .skipTaskbar false
                  .titleBarStyle wm.TitleBarStyle/hidden)]
     (wm.windowManager/waitUntilReadyToShow
-     options 
+     options
      ^:async (fn []
                (await (wm.windowManager/show))
                (await (wm.windowManager/focus)))))
 
-  (m/runApp
-   (m/MaterialApp
-    .title "Welcome to Flutter"
-    .theme (m/ThemeData .primarySwatch m.Colors/blue
-                        .fontFamily "MongolianBaiZheng")
-    .home (m/Scaffold
-           .body
-           (m/Center
-            .child (mgl/MongolText "Hello World!")))
-    .debugShowCheckedModeBanner false)))
+  (let [initial-theme (await (themes/initial-theme))]
+    (m/runApp
+     (adaptive/AdaptiveTheme
+      .light themes/light-theme
+      .dark themes/dark-theme
+      .initial initial-theme
+      .builder (fn [light dark]
+                 (m/MaterialApp
+                  .title "Welcome to Flutter"
+                  .theme light
+                  .darkTheme dark
+                  .home (m/Scaffold
+                         .body
+                         (m/Center
+                          .child (mgl/MongolText "Hello World!")))
+                  .debugShowCheckedModeBanner false))))))
