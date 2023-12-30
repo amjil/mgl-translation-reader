@@ -1,0 +1,8 @@
+{:full-name "kit/translation-reader"
+ :ns-name   "kit.translation-reader"
+ :sanitized "kit/translation_reader"
+ :name      "translation-reader"
+ :modules   {:root         "modules"
+             :repositories [{:url  "https://github.com/kit-clj/modules.git"
+                             :tag  "master"
+                             :name "kit-modules"}]}}
