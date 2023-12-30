@@ -1,0 +1,5 @@
+(ns translation-reader.states.global)
+
+(def state
+  (atom
+   {}))

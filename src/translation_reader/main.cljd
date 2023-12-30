@@ -5,7 +5,9 @@
    ["package:adaptive_theme/adaptive_theme.dart" :as adaptive]
    ["package:window_manager/window_manager.dart" :as wm]
    [translation-reader.utils.themes :as themes]
-   [translation-reader.screens.home :as home]))
+   [translation-reader.screens.home :as home]
+   [translation-reader.screens.signup :as signup]
+   [translation-reader.screens.login :as login]))
 
 (defn main []
   (m.WidgetsFlutterBinding/ensureInitialized)
@@ -35,5 +37,9 @@
                   .title "Welcome to Flutter"
                   .theme light
                   .darkTheme dark
-                  .home (home/screen)
+                  ;; .home (home/screen)
+                  .initialRoute "/"
+                  .routes {"/"  home/screen
+                           "/login" login/screen
+                           "/signup" signup/screen}
                   .debugShowCheckedModeBanner false))))))

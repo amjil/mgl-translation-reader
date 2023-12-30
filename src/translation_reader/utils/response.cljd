@@ -1,0 +1,11 @@
+(ns translation-reader.utils.response
+  (:require
+   ["dart:convert" :as convert]
+   ["package:http/http.dart" :as http]
+   [translation-reader.utils.util :as util]))
+
+(defn response-message [ctx ^http/Response response success-fn]
+  (let [response-body (convert/jsonDecode (.-body response))]
+    (if (not= 200 (.-statusCode response))
+      (util/show-toast ctx (get-in response-body ["data" "message"]))
+      (success-fn response-body))))
