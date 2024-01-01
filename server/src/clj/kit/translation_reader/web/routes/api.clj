@@ -40,6 +40,19 @@
            :handler (swagger/create-swagger-handler)}}]
    ["/health"
     {:get health/healthcheck!}]
+  ;;  ["/articles"
+  ;;   {:swagger {:tags ["article"]}
+  ;;    :get     {:summary    "get list."
+  ;;              :middleware [[middleware/wrap-restricted]]
+  ;;              :parameters {:query {(ds/opt :page)    int?
+  ;;                                   (ds/opt :perpage) int?}}
+  ;;              :responses  {200 {:body {:code            int?
+  ;;                                       :msg             string?
+  ;;                                       (ds/opt :errors) any?
+  ;;                                       (ds/opt :data)   any?}}}
+  ;;              :handler    (fn [{token           :identity
+  ;;                                {:keys [query]} :parameters}]
+  ;;                            (ok (service/get-models token query)))}}]
    ["/auth"
     {:swagger {:tags ["auth"]}}
     ["/login"
