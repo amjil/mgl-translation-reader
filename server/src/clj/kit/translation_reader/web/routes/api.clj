@@ -2,6 +2,8 @@
   (:require
     [kit.translation-reader.web.controllers.health :as health]
     [kit.translation-reader.web.controllers.auth :as auth]
+    [kit.translation-reader.web.controllers.article :as article]
+    [kit.translation-reader.web.middleware.core :as middleware]
     [kit.translation-reader.web.middleware.exception :as exception]
     [kit.translation-reader.web.middleware.formats :as formats]
     [integrant.core :as ig]
@@ -40,19 +42,17 @@
            :handler (swagger/create-swagger-handler)}}]
    ["/health"
     {:get health/healthcheck!}]
-  ;;  ["/articles"
-  ;;   {:swagger {:tags ["article"]}
-  ;;    :get     {:summary    "get list."
-  ;;              :middleware [[middleware/wrap-restricted]]
-  ;;              :parameters {:query {(ds/opt :page)    int?
-  ;;                                   (ds/opt :perpage) int?}}
-  ;;              :responses  {200 {:body {:code            int?
-  ;;                                       :msg             string?
-  ;;                                       (ds/opt :errors) any?
-  ;;                                       (ds/opt :data)   any?}}}
-  ;;              :handler    (fn [{token           :identity
-  ;;                                {:keys [query]} :parameters}]
-  ;;                            (ok (service/get-models token query)))}}]
+   ["/articles"
+    {:swagger {:tags ["article"]}
+     :get     {:summary    "get list."
+               :middleware [[middleware/wrap-restricted]]
+               :parameters {:query [:map
+                                    [:limit {:optional true} int?]
+                                    [:offset {:optional true} int?]]}
+               :responses {200 {:body any?}}
+               :handler (fn [{{:keys [query]} :parameters uinfo :identity}]
+                          {:status 200 :body
+                           (article/get-articles (:query-fn _opts) uinfo query)})}}]
    ["/auth"
     {:swagger {:tags ["auth"]}}
     ["/login"
