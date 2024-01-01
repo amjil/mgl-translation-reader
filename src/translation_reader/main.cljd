@@ -11,7 +11,7 @@
 
 (defn main []
   (m.WidgetsFlutterBinding/ensureInitialized)
-  (await (.load dotenv/dotenv .fileName ".env"))
+  (await (.load dotenv/dotenv .fileName "assets/.env"))
   (await (wm.windowManager/ensureInitialized))
 
   (let [options (wm/WindowOptions
