@@ -4,7 +4,7 @@
            :prod :prod}
 
  :server/http
- {:port #long #or [#env PORT 3000]
+ {:port #long #or [#env PORT 3002]
   :host #or [#env HTTP_HOST "0.0.0.0"]
   :handler #ig/ref :handler/ring}
 
@@ -56,8 +56,8 @@
                      :migrate-on-init? true}
 
  :db.sql/connection
- #profile {:dev {:jdbc-url "jdbc:postgresql://10.1.0.2:5432/translation_reader_dev?user=appuser&password=appuer"},
-           :test {:jdbc-url "jdbc:postgresql://10.1.0.2:5432/translation_reader_dev?user=appuser&password=appuer"},
+ #profile {:dev {:jdbc-url "jdbc:postgresql://localhost:5432/translation_reader_dev?user=appuser&password=appuer"},
+           :test {:jdbc-url "jdbc:postgresql://localhost:5432/translation_reader_dev?user=appuser&password=appuer"},
            :prod {:jdbc-url #env JDBC_URL}}
  ;;  :db.sql/connection
 ;;  :db.sql/hikari-connection

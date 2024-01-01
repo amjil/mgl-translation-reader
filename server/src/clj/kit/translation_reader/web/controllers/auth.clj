@@ -16,15 +16,7 @@
     (check/check-must-exist entity "User must exists!")
     (check/check-locked entity "User locked!")
     (check/check-password entity params "User Password Do Not Match!")
-    (let [info (db/find-one-by-keys
-                conn
-                :user_info
-                ["id = ?::uuid" (:id entity)]
-                {:columns [:profile_image_url :sex
-                           :followings_count :profile_banner_url :screen_name :bio :birth_date :location :followers_count
-                           :id]})]
-      {:token (token/jwt-token secret {:id (:id entity)})
-       :info info})))
+    {:token (token/jwt-token secret {:id (:id entity)})}))
 
 (declare check-before-signup)
 
@@ -34,12 +26,11 @@
   (let [result (db/insert! conn :users {:email (:email params)
                                         :encrypted_password  (hashers/derive (:password params))})]
     (check/check-not-nil (:id result) "Account Save Error!")
-    
-    (db/insert! conn :user_info {:id (:id result)})
 
     {}))
 
-(defn- check-before-signup 
+(defn- check-before-signup
   [conn params]
+  (check/check-must-exist (:email params) "Must NOT Empty")
   (let [entity (db/find-by-keys conn :users {:email (:email params)})]
     (check/check-must-not-exist entity "User Must Not Exists!")))

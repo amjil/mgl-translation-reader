@@ -9,6 +9,10 @@
    :get {{{primary-color .-primary} .-colorScheme} m/Theme}
    (m/TextFormField
     .controller controller
+    .obscureText (if (or (= hint-text "Password")
+                         (= hint-text "Confirmation"))
+                   true
+                   false)
     .decoration
     (m/InputDecoration
      .focusedBorder

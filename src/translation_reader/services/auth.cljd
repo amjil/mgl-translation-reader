@@ -13,6 +13,7 @@
    [translation-reader.services.token :as token-service]))
 
 (defn login [ctx ^widgets/NavigatorState navigator info  success-fn]
+  (swap! gs/state assoc :is-loading? true)
   (utils/show-indicator ctx)
   (try
     (let [result (await
@@ -21,6 +22,7 @@
                              .body
                              (convert/jsonEncode
                               info)))]
+      (.pop navigator)
       (response/response-message
        ctx
        result
@@ -35,25 +37,29 @@
         (-> m/Navigator (.of ctx) .pop)))))
 
 (defn signup [ctx ^widgets/NavigatorState navigator info]
-  (swap! gs/state assoc :is-loading? true)
-  (utils/show-indicator ctx)
-  (if (not= (get info "password")
-            (get info "password_confirmation"))
-    (utils/show-toast ctx "Password confirmation")
-    (try
-      (let [result (await
-                    (http/post (Uri/http (env/get "base_url") "/api/auth/signup")
-                               .headers {"Content-Type" "application/json; charset=UTF-8"}
-                               .body
-                               (convert/jsonEncode
-                                info)))]
-        (response/response-message
-         ctx
-         result
-         (fn [_]
-           (.pushNamed navigator "/login"))))
-      (catch io/SocketException e
-        (utils/show-toast ctx "Socket Exception")
-        (when (true? (:is-loading? @gs/state))
-          (swap! gs/state assoc :is-loading? false)
-          (-> m/Navigator (.of ctx) .pop))))))
+  (if (empty? (get info "email"))
+    (utils/show-toast ctx "Must NOT Empty")
+    (do
+      (swap! gs/state assoc :is-loading? true)
+      (utils/show-indicator ctx)
+      (if (not= (get info "password")
+                (get info "password_confirmation"))
+        (utils/show-toast ctx "Password confirmation")
+        (try
+          (let [result (await
+                        (http/post (Uri/http (env/get "base_url") "/api/auth/signup")
+                                   .headers {"Content-Type" "application/json; charset=UTF-8"}
+                                   .body
+                                   (convert/jsonEncode
+                                    info)))]
+            (.pop navigator)
+            (response/response-message
+             ctx
+             result
+             (fn [_]
+               (.pushNamed navigator "/login"))))
+          (catch io/SocketException e
+            (utils/show-toast ctx "Socket Exception")
+            (when (true? (:is-loading? @gs/state))
+              (swap! gs/state assoc :is-loading? false)
+              (-> m/Navigator (.of ctx) .pop))))))))
