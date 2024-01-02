@@ -3,6 +3,7 @@
    ["package:flutter/material.dart" :as m]
    [cljd.flutter :as f]
    [translation-reader.screens.signup :as signup]
+   [translation-reader.screens.articles :as articles]
    [translation-reader.widgets.menu :as menu]
    [translation-reader.states.global :as gs]))
    
@@ -14,13 +15,4 @@
      (signup/screen ctx)
 
      :else
-     (f/widget
-      (m/Scaffold)
-      .body
-      (m/Padding
-       .padding (m.EdgeInsets/only .top 40))
-      (m/Row
-       .children
-       [(menu/view)
-        (m/VerticalDivider
-         .color (-> m/Theme (.of ctx) .-colorScheme .-primary))])))))
+     articles/screen)))
