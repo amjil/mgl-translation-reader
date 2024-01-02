@@ -1,15 +1,17 @@
 (ns translation-reader.main
   (:require
    ["package:flutter/material.dart" :as m]
-   ["package:mongol/mongol.dart" :as mgl]
    ["package:flutter_dotenv/flutter_dotenv.dart" :as dotenv]
    ["package:adaptive_theme/adaptive_theme.dart" :as adaptive]
    ["package:window_manager/window_manager.dart" :as wm]
-   [translation-reader.utils.themes :as themes]))
+   [translation-reader.utils.themes :as themes]
+   [translation-reader.screens.home :as home]
+   [translation-reader.screens.signup :as signup]
+   [translation-reader.screens.login :as login]))
 
 (defn main []
   (m.WidgetsFlutterBinding/ensureInitialized)
-  (await (.load dotenv/dotenv .fileName ".env"))
+  (await (.load dotenv/dotenv .fileName "assets/.env"))
   (await (wm.windowManager/ensureInitialized))
 
   (let [options (wm/WindowOptions
@@ -35,8 +37,9 @@
                   .title "Welcome to Flutter"
                   .theme light
                   .darkTheme dark
-                  .home (m/Scaffold
-                         .body
-                         (m/Center
-                          .child (mgl/MongolText "Hello World!")))
+                  ;; .home (home/screen)
+                  .initialRoute "/"
+                  .routes {"/"  home/screen
+                           "/login" login/screen
+                           "/signup" signup/screen}
                   .debugShowCheckedModeBanner false))))))

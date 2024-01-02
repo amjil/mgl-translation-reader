@@ -1,0 +1,18 @@
+(ns translation-reader.screens.home
+  (:require 
+   ["package:flutter/material.dart" :as m]
+   [cljd.flutter :as f]
+   [translation-reader.screens.signup :as signup]
+   [translation-reader.screens.articles :as articles]
+   [translation-reader.widgets.menu :as menu]
+   [translation-reader.states.global :as gs]))
+   
+(defn ^m/Widget screen [ctx]
+  (f/widget
+   :watch [{:keys [user-token]} gs/state]
+   (cond
+     (empty? user-token)
+     (signup/screen ctx)
+
+     :else
+     articles/screen)))

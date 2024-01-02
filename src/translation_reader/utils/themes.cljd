@@ -4,7 +4,7 @@
    ["package:adaptive_theme/adaptive_theme.dart" :as adaptive]
    [translation-reader.services.pref :as pref]))
    
-(declare default-light-theme default-light-theme)
+(declare light-theme light-theme)
 
 (defn set-dark [ctx]
   (pref/set-int "theme-setting" 1)

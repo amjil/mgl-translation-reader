@@ -1,0 +1,65 @@
+(ns translation-reader.services.auth
+  (:require
+   ["package:flutter/material.dart" :as m]
+   ["package:flutter/widgets.dart" :as widgets]
+   ["package:http/http.dart" :as http]
+   ["dart:io" :as io]
+   ["dart:convert" :as convert]
+
+   [translation-reader.states.global :as gs]
+   [translation-reader.utils.util :as utils]
+   [translation-reader.utils.response :as response]
+   [translation-reader.services.env :as env]
+   [translation-reader.services.token :as token-service]))
+
+(defn login [ctx ^widgets/NavigatorState navigator info  success-fn]
+  (swap! gs/state assoc :is-loading? true)
+  (utils/show-indicator ctx)
+  (try
+    (let [result (await
+                  (http/post (Uri/http (env/get "base_url") "/api/auth/login")
+                             .headers {"Content-Type" "application/json; charset=UTF-8"}
+                             .body
+                             (convert/jsonEncode
+                              info)))]
+      (.pop navigator)
+      (response/response-message
+       ctx
+       result
+       (fn [x]
+         (token-service/save-token (get x "token"))
+         (when-not (nil? success-fn)
+           (success-fn)))))
+    (catch io/SocketException e
+      (utils/show-toast ctx "Socket Exception")
+      (when (true? (:is-loading? @gs/state))
+        (swap! gs/state assoc :is-loading? false)
+        (-> m/Navigator (.of ctx) .pop)))))
+
+(defn signup [ctx ^widgets/NavigatorState navigator info]
+  (if (empty? (get info "email"))
+    (utils/show-toast ctx "Must NOT Empty")
+    (do
+      (swap! gs/state assoc :is-loading? true)
+      (utils/show-indicator ctx)
+      (if (not= (get info "password")
+                (get info "password_confirmation"))
+        (utils/show-toast ctx "Password confirmation")
+        (try
+          (let [result (await
+                        (http/post (Uri/http (env/get "base_url") "/api/auth/signup")
+                                   .headers {"Content-Type" "application/json; charset=UTF-8"}
+                                   .body
+                                   (convert/jsonEncode
+                                    info)))]
+            (.pop navigator)
+            (response/response-message
+             ctx
+             result
+             (fn [_]
+               (.pushNamed navigator "/login"))))
+          (catch io/SocketException e
+            (utils/show-toast ctx "Socket Exception")
+            (when (true? (:is-loading? @gs/state))
+              (swap! gs/state assoc :is-loading? false)
+              (-> m/Navigator (.of ctx) .pop))))))))

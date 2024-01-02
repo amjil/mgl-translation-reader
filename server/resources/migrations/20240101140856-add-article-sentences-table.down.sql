@@ -1,0 +1,1 @@
+drop table IF EXISTS article_sentences;
