@@ -3,6 +3,7 @@
     [kit.translation-reader.web.controllers.health :as health]
     [kit.translation-reader.web.controllers.auth :as auth]
     [kit.translation-reader.web.controllers.article :as article]
+    [kit.translation-reader.web.controllers.sentences :as sentences]
     [kit.translation-reader.web.middleware.core :as middleware]
     [kit.translation-reader.web.middleware.exception :as exception]
     [kit.translation-reader.web.middleware.formats :as formats]
@@ -89,6 +90,37 @@
               :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
                          {:status 200 :body
                           (article/delete-article (:query-fn _opts) uinfo id)})}}]
+   ["/article_sentences/initiate"
+    {:swagger {:tags ["sentences"]}
+     :post {:summary "initiate sentences."
+            :middleware [[middleware/wrap-restricted]]
+            :parameters {:body [:map
+                                [:article_id string?]]}
+            :responses {200 {:body any?}}
+            :handler (fn [{{body :body} :parameters uinfo :identity}]
+                       {:status 200 :body
+                        (sentences/initiate-sentences (:query-fn _opts) uinfo body)})}}]
+   ["/article_sentences"
+    {:swagger {:tags ["sentences"]}
+     :post {:summary "create sentences."
+            :middleware [[middleware/wrap-restricted]]
+            :parameters {:body [:map
+                                [:serial_number  int?]
+                                [:article_id  string?]
+                                [:content  string?]]}
+            :responses {200 {:body any?}}
+            :handler (fn [{{body :body} :parameters uinfo :identity}]
+                       {:status 200 :body
+                        (article/create-article (:query-fn _opts) uinfo body)})}
+     :delete {:summary "delete sentences."
+              :middleware [[middleware/wrap-restricted]]
+              :parameters {:body [:map
+                                  [:article_id  string?]
+                                  [:lang {:optional true} string?]]}
+              :responses {200 {:body any?}}
+              :handler (fn [{{body :body} :parameters uinfo :identity}]
+                         {:status 200 :body
+                          (article/create-article (:query-fn _opts) uinfo body)})}}]
    ["/auth"
     {:swagger {:tags ["auth"]}}
     ["/login"

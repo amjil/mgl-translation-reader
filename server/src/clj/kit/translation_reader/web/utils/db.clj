@@ -50,6 +50,16 @@
                  {:builder-fn rs/as-unqualified-lower-maps}
                  opt))))
 
+(defn insert-multi! 
+  ([conn t cols list]
+   (sql/insert-multi! conn t cols list
+                      {:builder-fn rs/as-unqualified-lower-maps}))
+  ([conn t cols list opt]
+   (sql/insert-multi! conn t cols list
+                      (merge
+                       {:builder-fn rs/as-unqualified-lower-maps}
+                       opt))))
+
 (defn delete! [conn t w]
   (sql/delete! conn t w))
 
