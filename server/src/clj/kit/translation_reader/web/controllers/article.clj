@@ -15,6 +15,9 @@
         offset (or (:offset params) 0)]
     (query-fn :query-articles {:limit limit :offset offset})))
 
+(defn get-article [db-conn uinfo id]
+  (db/find-one-by-keys db-conn :articles {:id (UUID/fromString id)}))
+
 (defn create-article [db-conn uinfo info]
   (db/insert! db-conn
               :articles

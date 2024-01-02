@@ -44,6 +44,15 @@
     {:get health/healthcheck!}]
    ["/articles"
     {:swagger {:tags ["article"]}
+     :post {:summary "create article."
+            :middleware [[middleware/wrap-restricted]]
+            :parameters {:body [:map
+                                [:original_lang {:optional true} string?]
+                                [:original_content {:optional true} string?]]}
+            :responses {200 {:body any?}}
+            :handler (fn [{{body :body} :parameters uinfo :identity}]
+                       {:status 200 :body
+                        (article/create-article (:query-fn _opts) uinfo body)})}
      :get     {:summary    "get list."
                :middleware [[middleware/wrap-restricted]]
                :parameters {:query [:map
@@ -53,6 +62,33 @@
                :handler (fn [{{:keys [query]} :parameters uinfo :identity}]
                           {:status 200 :body
                            (article/get-articles (:query-fn _opts) uinfo query)})}}]
+   ["/articles/:id"
+    {:swagger {:tags ["article"]}
+     :post {:summary "update article."
+            :middleware [[middleware/wrap-restricted]]
+            :parameters {:path {:id string?}
+                         :body [:map
+                                [:original_lang {:optional true} string?]
+                                [:original_content {:optional true} string?]]}
+            :responses {200 {:body any?}}
+            :handler (fn [{{{id :id} :path
+                            body :body} :parameters uinfo :identity}]
+                       {:status 200 :body
+                        (article/update-article (:query-fn _opts) uinfo id body)})}
+     :get {:summary    "get article."
+           :middleware [[middleware/wrap-restricted]]
+           :parameters {:path {:id string?}}
+           :responses {200 {:body any?}}
+           :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
+                      {:status 200 :body
+                       (article/get-article (:query-fn _opts) uinfo id)})}
+     :delete {:summary    "delete a article."
+              :middleware [[middleware/wrap-restricted]]
+              :parameters {:path {:id string?}}
+              :responses {200 {:body any?}}
+              :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
+                         {:status 200 :body
+                          (article/delete-article (:query-fn _opts) uinfo id)})}}]
    ["/auth"
     {:swagger {:tags ["auth"]}}
     ["/login"

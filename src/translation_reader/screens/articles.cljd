@@ -1,7 +1,8 @@
 (ns translation-reader.screens.articles
-  (:require 
+  (:require
    ["package:flutter/material.dart" :as m]
    [cljd.flutter :as f]
+   [translation-reader.widgets.articles-list :as articles-list]
    [translation-reader.widgets.menu :as menu]))
 
 (def screen 
@@ -15,4 +16,5 @@
     .children
     [(menu/view)
      (m/VerticalDivider
-      .color primary-color)])))
+      .color primary-color)
+     (articles-list/list-view)])))

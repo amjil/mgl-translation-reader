@@ -1,33 +1,74 @@
 (ns translation-reader.services.article
   (:require
-   ["package:flutter/material.dart" :as m]
    ["package:flutter/widgets.dart" :as widgets]
-   ["package:http/http.dart" :as http]
-   ["dart:io" :as io]
-   ["dart:convert" :as convert]
 
+   [translation-reader.services.common :as common]
    [translation-reader.states.global :as gs]
-   [translation-reader.utils.util :as utils]
-   [translation-reader.utils.response :as response]
-   [translation-reader.services.env :as env]))
+   [translation-reader.utils.util :as util]))
 
-(defn article-list [ctx ^widgets/NavigatorState navigator info success-fn]
-  (swap! gs/state assoc :is-loading? true)
-  (utils/show-indicator ctx)
-  (try
-    (let [result (await
-                  (http/get (Uri/http (env/get "base_url") "/api/articles" info)
-                            .headers {"Content-Type" "application/json; charset=UTF-8"
-                                      "Authorization" (str "Token " (get @gs/state :user-token))}))]
-      (.pop navigator)
-      (response/response-message
-       ctx
-       result
-       (fn [x]
-         (when-not (nil? success-fn)
-           (success-fn)))))
-    (catch io/SocketException e
-      (utils/show-toast ctx "Socket Exception")
-      (when (true? (:is-loading? @gs/state))
-        (swap! gs/state assoc :is-loading? false)
-        (-> m/Navigator (.of ctx) .pop)))))
+(defn article-list [ctx ^widgets/NavigatorState navigator info]
+  (common/get ctx
+              navigator
+              {:token true
+               :url "/api/articles"
+               :info info
+               :success-fn (fn [result]
+                             (let [{limit "limit"
+                                    offset "offset"} info
+                                   has-more? (if (empty? limit)
+                                               (>= (count result) 20)
+                                               (>= (count result) limit))]
+                               (swap! gs/state
+                                      assoc
+                                      :articles
+                                      {:has-more? has-more?
+                                       :offset offset 
+                                       :limit limit
+                                       :list
+                                       (if (or (empty? offset) (zero? offset))
+                                         result
+                                         (concat (get-in @gs/state [:articles :list])
+                                                 result))})))}))
+                                                 
+(defn get-article [ctx ^widgets/NavigatorState navigator id]
+  (common/get ctx
+              navigator
+              {:token true
+               :url (str "/api/articles/" id)
+               :success-fn (fn [x] 
+                             (swap! gs/state
+                                    assoc 
+                                    :article
+                                    (into {} x)))}))
+                                    
+(defn create-article [ctx ^widgets/NavigatorState navigator info]
+  (common/post ctx
+               navigator
+               {:token true
+                :url "/api/articles"
+                :info info
+                :success-fn (fn [_]
+                              (util/show-toast ctx "Created Success!")
+                              (.popUntil navigator (widgets.ModalRoute/withName "/"))
+                              (article-list ctx navigator nil))}))
+
+(defn update-article [ctx ^widgets/NavigatorState navigator id info]
+  (common/post ctx
+               navigator
+               {:token true
+                :url (str "/api/articles/" id)
+                :info info
+                :success-fn (fn [_]
+                              (util/show-toast ctx "Created Success!")
+                              (.popUntil navigator (widgets.ModalRoute/withName "/"))
+                              (article-list ctx navigator nil))}))
+
+(defn delete-article [ctx ^widgets/NavigatorState navigator id]
+  (common/delete ctx
+                 navigator
+                 {:token true
+                  :url (str "/api/articles/" id)
+                  :success-fn (fn [_]
+                                (util/show-toast ctx "Created Success!")
+                                (.popUntil navigator (widgets.ModalRoute/withName "/"))
+                                (article-list ctx navigator nil))}))

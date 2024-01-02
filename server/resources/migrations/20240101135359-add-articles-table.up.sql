@@ -3,6 +3,7 @@ CREATE TABLE articles (
     user_id uuid NOT NULL REFERENCES users ("id") ON DELETE CASCADE,
     original_lang varchar(20),
     original_content text,
+    original_url text,
     content text,
     status smallint DEFAULT 1 NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,

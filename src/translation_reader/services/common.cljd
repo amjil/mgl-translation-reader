@@ -1,0 +1,60 @@
+(ns translation-reader.services.common
+  (:require 
+   ["package:flutter/material.dart" :as m]
+   ["package:flutter/widgets.dart" :as widgets]
+   ["package:http/http.dart" :as http]
+   ["dart:io" :as io]
+   ["dart:convert" :as convert]
+   
+   [translation-reader.states.global :as gs]
+   [translation-reader.utils.util :as utils]
+   [translation-reader.utils.response :as response]
+   [translation-reader.services.env :as env]))
+   
+(defn request [ctx
+               ^widgets/NavigatorState navigator
+               {:keys [method url token info success-fn]}]
+  (swap! gs/state assoc :is-loading? true)
+  (utils/show-indicator ctx)
+  (try
+    (let [token-str (:user-token @gs/state)
+          token-header (if (true? token)
+                         {"Authorization" (str "Token " token-str)}
+                         {})
+          result (await
+                  (condp = method
+                    :post
+                    (http/post (Uri/http (env/get "base_url") url)
+                               .headers (merge {"Content-Type" "application/json; charset=UTF-8"}
+                                               token-header)
+                               .body
+                               (convert/jsonEncode
+                                info))
+                    :get
+                    (http/get (Uri/http (env/get "base_url") url info)
+                              .headers (merge {"Content-Type" "application/json; charset=UTF-8"}
+                                              token-header))
+
+                    :delete
+                    (http/delete (Uri/http (env/get "base_url") url))))]
+      (.pop navigator)
+      (response/response-message
+       ctx
+       result
+       (fn [x]
+         (when-not (nil? success-fn)
+           (success-fn x)))))
+    (catch io/SocketException e
+      (utils/show-toast ctx "Socket Exception")
+      (when (true? (:is-loading? @gs/state))
+        (swap! gs/state assoc :is-loading? false)
+        (-> m/Navigator (.of ctx) .pop)))))
+        
+(defn post [ctx ^widgets/NavigatorState navigator params]
+  (request ctx navigator (assoc params :method :post)))
+
+(defn get [ctx ^widgets/NavigatorState navigator params]
+  (request ctx navigator (assoc params :method :get)))
+
+(defn delete [ctx ^widgets/NavigatorState navigator params]
+  (request ctx navigator (assoc params :method :delete)))

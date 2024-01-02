@@ -1,0 +1,46 @@
+(ns translation-reader.widgets.articles-list
+  (:require 
+   ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]
+   [cljd.flutter :as f]
+   [translation-reader.states.global :as gs]))
+   
+(defn list-item [i item]
+   (f/widget
+    :get {navigator m/Navigator}
+    (m/GestureDetector
+     .onTap (fn []
+              (swap! gs/state assoc :article item)
+              (.pushNamed navigator "/article")
+              nil))
+    (m/Container
+     .width 40)
+    (m/Column
+     .mainAxisAlignment m.MainAxisAlignment/center
+     .children
+     [(m/Expanded
+       .child (m/Column
+               .children
+               [(m/Icon m.Icons/folder)
+                (m/SizedBox .height 10)
+                (mgl/MongolText
+                 (str "" (get item "name"))
+                 .maxLines 1
+                 .softWrap true
+                 .overflow m.TextOverflow/ellipsis
+                 .style (m/TextStyle
+                         .fontSize 20))]))])))
+   
+(defn list-view []
+  (f/widget
+   :get {{{primary-color .-primary} .-colorScheme} m/Theme}
+   :watch [{articles :articles} gs/state]
+   (m.ListView/separated
+    .scrollDirection m.Axis/horizontal
+    .separatorBuilder (fn [context i]
+                        (m/VerticalDivider
+                         .color primary-color))
+    .itemCount (count articles)
+    .itemBuilder (fn [context i]
+                   (list-item i (nth articles i)))
+    .shrinkWrap true)))
