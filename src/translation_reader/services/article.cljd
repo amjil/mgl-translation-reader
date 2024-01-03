@@ -72,3 +72,21 @@
                                 (util/show-toast ctx "Created Success!")
                                 (.popUntil navigator (widgets.ModalRoute/withName "/"))
                                 (article-list ctx navigator nil))}))
+
+(defn initiate-sentences [ctx ^widgets/NavigatorState navigator id]
+  (common/post ctx
+               navigator
+               {:token true
+                :url "/api/article_sentences/initiate" 
+                :info {"article_id" id}
+                :success-fn (fn [_]
+                              (util/show-toast ctx "Success!"))}))
+                              
+(defn delete-sentences [ctx ^widgets/NavigatorState navigator id]
+  (common/post ctx
+               navigator
+               {:token true
+                :url "/api/article_sentences/delete"
+                :info {"article_id" id}
+                :success-fn (fn [_]
+                              (util/show-toast ctx "Success!"))}))
