@@ -25,3 +25,4 @@ Made possible by the following projects:
 2. Init the example `clj -M:cljd init`
 3. Open a simulator `open -a Simulator`
 4. Run flutter `clj -M:cljd flutter -d macos`
+On Web Browser use --web-browser-flag "--disable-web-security" this option for test.
