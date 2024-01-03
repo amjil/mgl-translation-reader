@@ -5,7 +5,10 @@
 select 
     a.id,
     a.original_lang,
-    substring(a.content, 200) as content,
+    case when length(a.original_content) > 200
+        then substring(a.original_content, 200) 
+        else a.original_content 
+        end as content,
     a.original_url,
     a.created_at,
     b.email

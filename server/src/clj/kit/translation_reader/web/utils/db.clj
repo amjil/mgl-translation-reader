@@ -117,9 +117,9 @@
     (.setValue (generate-string value))))
 
 (extend-protocol next.jdbc.prepare/SettableParameter
-  clojure.lang.IPersistentMap
-  (set-parameter [^clojure.lang.IPersistentMap v ^java.sql.PreparedStatement stmt ^long idx]
-    (.setObject stmt idx (clj->jsonb-pgobj v)))
+  ;; clojure.lang.IPersistentMap
+  ;; (set-parameter [^clojure.lang.IPersistentMap v ^java.sql.PreparedStatement stmt ^long idx]
+  ;;   (.setObject stmt idx (clj->jsonb-pgobj v)))
   clojure.lang.IPersistentVector
   (set-parameter [^clojure.lang.IPersistentVector v ^java.sql.PreparedStatement stmt ^long idx]
     (let [conn      (.getConnection stmt)

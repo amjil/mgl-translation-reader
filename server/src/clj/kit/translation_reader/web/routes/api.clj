@@ -49,11 +49,12 @@
             :middleware [[middleware/wrap-restricted]]
             :parameters {:body [:map
                                 [:original_lang {:optional true} string?]
-                                [:original_content {:optional true} string?]]}
+                                [:original_content string?]
+                                [:original_url {:optional true} string?]]}
             :responses {200 {:body any?}}
             :handler (fn [{{body :body} :parameters uinfo :identity}]
                        {:status 200 :body
-                        (article/create-article (:query-fn _opts) uinfo body)})}
+                        (article/create-article (:db-conn _opts) uinfo body)})}
      :get     {:summary    "get list."
                :middleware [[middleware/wrap-restricted]]
                :parameters {:query [:map
@@ -75,21 +76,21 @@
             :handler (fn [{{{id :id} :path
                             body :body} :parameters uinfo :identity}]
                        {:status 200 :body
-                        (article/update-article (:query-fn _opts) uinfo id body)})}
+                        (article/update-article (:db-conn _opts) uinfo id body)})}
      :get {:summary    "get article."
            :middleware [[middleware/wrap-restricted]]
            :parameters {:path {:id string?}}
            :responses {200 {:body any?}}
            :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
                       {:status 200 :body
-                       (article/get-article (:query-fn _opts) uinfo id)})}
+                       (article/get-article (:db-conn _opts) uinfo id)})}
      :delete {:summary    "delete a article."
               :middleware [[middleware/wrap-restricted]]
               :parameters {:path {:id string?}}
               :responses {200 {:body any?}}
               :handler (fn [{{{id :id} :path} :parameters uinfo :identity}]
                          {:status 200 :body
-                          (article/delete-article (:query-fn _opts) uinfo id)})}}]
+                          (article/delete-article (:db-conn _opts) uinfo id)})}}]
    ["/article_sentences/initiate"
     {:swagger {:tags ["sentences"]}
      :post {:summary "initiate sentences."
@@ -99,7 +100,7 @@
             :responses {200 {:body any?}}
             :handler (fn [{{body :body} :parameters uinfo :identity}]
                        {:status 200 :body
-                        (sentences/initiate-sentences (:query-fn _opts) uinfo body)})}}]
+                        (sentences/initiate-sentences (:db-conn _opts) uinfo body)})}}]
    ["/article_sentences"
     {:swagger {:tags ["sentences"]}
      :post {:summary "create sentences."
@@ -111,16 +112,18 @@
             :responses {200 {:body any?}}
             :handler (fn [{{body :body} :parameters uinfo :identity}]
                        {:status 200 :body
-                        (article/create-article (:query-fn _opts) uinfo body)})}
-     :delete {:summary "delete sentences."
-              :middleware [[middleware/wrap-restricted]]
-              :parameters {:body [:map
-                                  [:article_id  string?]
-                                  [:lang {:optional true} string?]]}
-              :responses {200 {:body any?}}
-              :handler (fn [{{body :body} :parameters uinfo :identity}]
-                         {:status 200 :body
-                          (article/create-article (:query-fn _opts) uinfo body)})}}]
+                        (sentences/update-sentence (:db-conn _opts) uinfo body)})}}]
+   ["/article_sentences/delete"
+    {:swagger {:tags ["sentences"]}
+     :post {:summary "delete sentences."
+            :middleware [[middleware/wrap-restricted]]
+            :parameters {:body [:map
+                                [:article_id  string?]
+                                [:lang {:optional true} string?]]}
+            :responses {200 {:body any?}}
+            :handler (fn [{{body :body} :parameters uinfo :identity}]
+                       {:status 200 :body
+                        (sentences/delete-sentences (:db-conn _opts) uinfo body)})}}]
    ["/auth"
     {:swagger {:tags ["auth"]}}
     ["/login"
