@@ -1,12 +1,19 @@
 (ns translation-reader.widgets.menu
-  (:require 
+  (:require
    ["package:flutter/material.dart" :as m]
    ["package:mongol/mongol.dart" :as mgl]
-   [cljd.flutter :as f]))
+   [cljd.flutter :as f]
+   [translation-reader.states.global :as gs]
+   [translation-reader.widgets.menu-buttons :as menu-buttons]
+   [translation-reader.utils.util :as util]))
    
 (defn view []
   (f/widget
-   (m/Padding 
+   :context ctx
+   :get {navigator m/Navigator
+         {{tertiary-color .-tertiaryContainer} .-colorScheme} m/Theme}
+   :watch [{menu-idx :menu-index} gs/state]
+   (m/Padding
     .padding (m.EdgeInsets/only .left 10))
    (m/Column
     .children
@@ -14,22 +21,49 @@
       .radius 18
       .backgroundColor m.Colors/blueAccent)
      (m/SizedBox .height 10)
-     (mgl/MongolTextButton
-      .onPressed (fn [] (dart:core/print "xxxx"))
+     (m/Container
+      .color (if (= menu-idx "read")
+               tertiary-color
+               nil)
       .child
-      (mgl/MongolText "ᠣᠩᠰᠢᠬᠤ"))
-     (mgl/MongolTextButton
-      .onPressed (fn [] (dart:core/print "xxxx"))
+      (mgl/MongolTextButton
+       .onPressed (fn [] 
+                    (.pushNamed navigator "/")
+                    (swap! gs/state assoc :menu-index "read")
+                    nil)
+       .child
+       (mgl/MongolText "ᠣᠩᠰᠢᠬᠤ")))
+     (m/Container
+      .color (if (= menu-idx "write")
+               tertiary-color
+               nil)
       .child
-      (mgl/MongolText "ᠪᠢᠴᠢᠬᠦ"))
+      (mgl/MongolTextButton
+       .onPressed (fn []
+                    (.pushNamed navigator "/write")
+                    (swap! gs/state assoc :menu-index "write")
+                    nil)
+       .child
+       (mgl/MongolText "ᠪᠢᠴᠢᠬᠦ")))
      (m/SizedBox .height 10)
-     (mgl/MongolTextButton
-      .onPressed (fn [] (dart:core/print "xxxx"))
+     (m/Container
+      .color (if (= menu-idx "words")
+               tertiary-color
+               nil)
       .child
-      (mgl/MongolText "ᠦᠭᠡᠰ"))
+      (mgl/MongolTextButton
+       .onPressed (fn [] (dart:core/print "xxxx"))
+       .child
+       (mgl/MongolText "ᠦᠭᠡᠰ")))
      (m/SizedBox .height 10)
-     (mgl/MongolTextButton
-      .onPressed (fn [] (dart:core/print "xxxx"))
+     (m/Container
+      .color (if (= menu-idx "settings")
+               tertiary-color
+               nil)
       .child
-      (mgl/MongolText " ᠲᠣᠬᠢᠷᠠᠭᠤᠯᠤᠯᠲᠠ"))
-     ])))
+      (mgl/MongolTextButton
+       .onPressed (fn []
+                    (dart:core/print "xxxx")
+                    nil)
+       .child
+       (mgl/MongolText " ᠲᠣᠬᠢᠷᠠᠭᠤᠯᠤᠯᠲᠠ")))])))

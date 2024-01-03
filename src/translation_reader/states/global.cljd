@@ -2,4 +2,4 @@
 
 (def state
   (atom
-   {}))
+   {:menu-index "read"}))

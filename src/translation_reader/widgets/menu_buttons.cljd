@@ -1,0 +1,41 @@
+(ns translation-reader.widgets.menu-buttons
+  (:require
+   ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]
+   [cljd.flutter :as f]))
+
+(defn menu-item [text icon on-press]
+  (f/widget
+   :context ctx
+   (m/TextButton
+    .style (m.TextButton/styleFrom
+            .minimumSize m.Size/zero
+            .padding (m.EdgeInsets/all 2)
+            .tapTargetSize m.MaterialTapTargetSize/shrinkWrap)
+    .child (m/Column
+            .mainAxisAlignment m.MainAxisAlignment/spaceBetween
+            .children
+            [(m/Icon icon
+                     .color (-> m/Theme (.of ctx) .-colorScheme .-onPrimary)
+                     .size 14)
+             (mgl/MongolText
+              text
+              .style (m/TextStyle
+                      .fontSize 12
+                      .color (-> m/Theme (.of ctx) .-colorScheme .-onPrimary)))])
+    .onPressed on-press)))
+
+(defn write-menu []
+  (f/widget
+   :context ctx
+   :get [m/Navigator]
+   (m/ListView
+    .scrollDirection m.Axis/horizontal
+    .shrinkWrap true
+    .children [(m/SizedBox .width 8)
+               (menu-item "AAA"
+                          m.Icons/create
+                          (fn []
+                            (.pop navigator)))
+               (m/VerticalDivider
+                .color (-> m/Theme (.of ctx) .-colorScheme .-outlineVariant))])))

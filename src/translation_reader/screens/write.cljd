@@ -1,0 +1,20 @@
+(ns translation-reader.screens.write
+  (:require
+   ["package:flutter/material.dart" :as m]
+   [cljd.flutter :as f]
+   [translation-reader.widgets.menu :as menu]
+   [translation-reader.states.global :as gs]))
+   
+(defn ^m/Widget screen [ctx]
+  (f/widget
+   :get {{{primary-color .-primary} .-colorScheme} m/Theme}
+   (m/Scaffold)
+   .body
+   (m/Padding
+    .padding (m.EdgeInsets/only .top 40))
+   (m/Row
+    .children
+    [(menu/view)
+     (m/VerticalDivider
+      .color primary-color)
+     ])))

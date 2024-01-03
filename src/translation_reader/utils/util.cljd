@@ -71,22 +71,21 @@
    .context ctx
    .pageBuilder (fn [context anim1 anim2]
                   (m/Align
-                   .alignment m.Alignment/topRight
+                   .alignment m.Alignment/centerLeft
                    .child
                    (m/SafeArea
                     .bottom false
                     .child
                     (m/Container
-                     .margin (m.EdgeInsets/only .top 40)
-                     .height 300
+                     .margin (m.EdgeInsets/only .left 60)
+                     .height 200
                      .decoration (m/BoxDecoration
                                   .color (-> m/Theme (.of ctx) .-colorScheme .-primaryContainer)
-                                  .borderRadius (.circular m/BorderRadius 20))
-                     .child (m.SizedBox/expand
-                             .child child)))))
+                                  .borderRadius (.circular m/BorderRadius 10))
+                     .child child))))
    .transitionBuilder (fn [context anim1 anim2 child]
                         (m/SlideTransition
-                         .position (.animate (m/Tween .begin (m/Offset 0.5 0) .end (m/Offset 0 0))
+                         .position (.animate (m/Tween .begin (m/Offset -0.5 0) .end (m/Offset 0 0))
                                              anim1)
                          .child child))))
                          
