@@ -7,7 +7,10 @@
    [translation-reader.utils.themes :as themes]
    [translation-reader.screens.home :as home]
    [translation-reader.screens.signup :as signup]
-   [translation-reader.screens.login :as login]))
+   [translation-reader.screens.login :as login]
+   [translation-reader.screens.write :as write]
+   [translation-reader.services.pref :as pref]
+   [translation-reader.states.global :as gs]))
 
 (defn main []
   (m.WidgetsFlutterBinding/ensureInitialized)
@@ -25,8 +28,12 @@
      ^:async (fn []
                (await (wm.windowManager/show))
                (await (wm.windowManager/focus)))))
-
-  (let [initial-theme (await (themes/initial-theme))]
+  
+  (let [initial-theme (await (themes/initial-theme))
+        token (await (pref/get-string "user-token"))]
+    (when (not-empty token)
+      (swap! gs/state assoc :user-token token))
+      
     (m/runApp
      (adaptive/AdaptiveTheme
       .light themes/light-theme
@@ -41,5 +48,6 @@
                   .initialRoute "/"
                   .routes {"/"  home/screen
                            "/login" login/screen
-                           "/signup" signup/screen}
+                           "/signup" signup/screen
+                           "/write" write/screen}
                   .debugShowCheckedModeBanner false))))))
