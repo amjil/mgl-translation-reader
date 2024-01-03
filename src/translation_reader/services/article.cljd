@@ -1,10 +1,35 @@
 (ns translation-reader.services.article
   (:require
    ["package:flutter/widgets.dart" :as widgets]
+   ["package:http/http.dart" :as http]
+   ["dart:convert" :as convert]
+   ["dart:io" :as io]
 
    [translation-reader.services.common :as common]
+   [translation-reader.services.env :as env]
    [translation-reader.states.global :as gs]
+   [translation-reader.utils.response :as response]
    [translation-reader.utils.util :as util]))
+
+(defn article-list-stream []
+  (stream
+   (map (fn [result]
+          (let [response-body (convert/jsonDecode (.-body result))]
+            (swap! gs/state
+                   assoc
+                   :articles
+                   {:has-more? false
+                    :offset 0
+                    :limit 20
+                    :list response-body}))
+          :ok-token))
+   (map (fn [[er st]]
+          :error-token))
+   :as-values
+   (.asStream
+    (http/get (Uri/http (env/get "base_url") "/api/articles" {})
+              .headers {"Content-Type" "application/json; charset=UTF-8"
+                        "Authorization" (str "Token " (get @gs/state :user-token))}))))
 
 (defn article-list [ctx ^widgets/NavigatorState navigator info]
   (common/get ctx
@@ -22,25 +47,25 @@
                                       assoc
                                       :articles
                                       {:has-more? has-more?
-                                       :offset offset 
+                                       :offset offset
                                        :limit limit
                                        :list
                                        (if (or (empty? offset) (zero? offset))
                                          result
                                          (concat (get-in @gs/state [:articles :list])
                                                  result))})))}))
-                                                 
+
 (defn get-article [ctx ^widgets/NavigatorState navigator id]
   (common/get ctx
               navigator
               {:token true
                :url (str "/api/articles/" id)
-               :success-fn (fn [x] 
+               :success-fn (fn [x]
                              (swap! gs/state
-                                    assoc 
+                                    assoc
                                     :article
                                     (into {} x)))}))
-                                    
+
 (defn create-article [ctx ^widgets/NavigatorState navigator info]
   (common/post ctx
                navigator
@@ -77,11 +102,11 @@
   (common/post ctx
                navigator
                {:token true
-                :url "/api/article_sentences/initiate" 
+                :url "/api/article_sentences/initiate"
                 :info {"article_id" id}
                 :success-fn (fn [_]
                               (util/show-toast ctx "Success!"))}))
-                              
+
 (defn delete-sentences [ctx ^widgets/NavigatorState navigator id]
   (common/post ctx
                navigator
@@ -90,3 +115,12 @@
                 :info {"article_id" id}
                 :success-fn (fn [_]
                               (util/show-toast ctx "Success!"))}))
+                              
+;;  (dart:core/print (get @gs/state :articles))
+;;  (article-service/article-list ctx navigator nil)
+;;  (article-service/create-article ctx navigator {"original_content" "dart:core/print"})
+;;  (article-service/delete-article ctx navigator "5cecaf12-707f-4620-9c51-a6ae576e9925")
+;;  (article-service/update-article ctx navigator "b05f1f44-99d7-4ec2-920c-29b5df00cf43" {"original_content" "dart:core/print11111"})
+                  
+;;  (article-service/initiate-sentences ctx navigator "02eb1bef-adde-4f0a-89d7-afddc6e3a1f8")
+;;  (article-service/delete-sentences ctx navigator "02eb1bef-adde-4f0a-89d7-afddc6e3a1f8")

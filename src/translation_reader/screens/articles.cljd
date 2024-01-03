@@ -3,11 +3,14 @@
    ["package:flutter/material.dart" :as m]
    [cljd.flutter :as f]
    [translation-reader.widgets.articles-list :as articles-list]
-   [translation-reader.widgets.menu :as menu]))
+   [translation-reader.widgets.menu :as menu]
+   [translation-reader.services.article :as article-service]
+   [translation-reader.states.global :as gs]))
 
 (def screen 
   (f/widget
    :get {{{primary-color .-primary} .-colorScheme} m/Theme}
+   :watch [article-stream (article-service/article-list-stream)]
    (m/Scaffold)
    .body
    (m/Padding
