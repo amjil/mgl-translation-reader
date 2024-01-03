@@ -36,7 +36,9 @@
                                               token-header))
 
                     :delete
-                    (http/delete (Uri/http (env/get "base_url") url))))]
+                    (http/delete (Uri/http (env/get "base_url") url)
+                                 .headers (merge {"Content-Type" "application/json; charset=UTF-8"}
+                                                 token-header))))]
       (.pop navigator)
       (response/response-message
        ctx
