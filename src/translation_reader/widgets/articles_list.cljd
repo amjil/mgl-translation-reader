@@ -21,20 +21,20 @@
      [(m/Expanded
        .child (m/Column
                .children
-               [(m/Icon m.Icons/folder)
+               [(m/Icon m.Icons/article_outlined)
                 (m/SizedBox .height 10)
                 (mgl/MongolText
-                 (str "" (get item "name"))
+                 (str "" (get item "content"))
                  .maxLines 1
                  .softWrap true
                  .overflow m.TextOverflow/ellipsis
                  .style (m/TextStyle
-                         .fontSize 20))]))])))
+                         .fontSize 14))]))])))
    
 (defn list-view []
   (f/widget
    :get {{{primary-color .-primary} .-colorScheme} m/Theme}
-   :watch [{articles :articles} gs/state]
+   :watch [{{articles :list} :articles} gs/state]
    (m.ListView/separated
     .scrollDirection m.Axis/horizontal
     .separatorBuilder (fn [context i]
