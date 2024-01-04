@@ -3,33 +3,35 @@
    ["package:flutter/material.dart" :as m]
    ["package:mongol/mongol.dart" :as mgl]
    [cljd.flutter :as f]
-   [translation-reader.states.global :as gs]))
+   [translation-reader.states.global :as gs]
+   [translation-reader.services.article :as article-service]))
    
 (defn list-item [i item]
    (f/widget
+    :context ctx
     :get {navigator m/Navigator}
     (m/GestureDetector
      .onTap (fn []
-              (swap! gs/state assoc :article item)
-              (.pushNamed navigator "/article")
+              (.pushNamed navigator "/read")
+              (article-service/get-article ctx navigator (get item "id"))
               nil))
     (m/Container
      .width 40)
     (m/Column
-     .mainAxisAlignment m.MainAxisAlignment/center
      .children
-     [(m/Expanded
-       .child (m/Column
-               .children
-               [(m/Icon m.Icons/article_outlined)
-                (m/SizedBox .height 10)
-                (mgl/MongolText
-                 (str "" (get item "content"))
-                 .maxLines 1
-                 .softWrap true
-                 .overflow m.TextOverflow/ellipsis
-                 .style (m/TextStyle
-                         .fontSize 14))]))])))
+     [(m/Icon m.Icons/article_outlined)
+      (m/SizedBox .height 10)
+      (m/Expanded
+       .child
+       (mgl/MongolText
+        (if (empty? (get item "content"))
+          (str "" (get item "original_content"))
+          (str "" (get item "content")))
+        .maxLines 1
+        .softWrap true
+        .overflow m.TextOverflow/ellipsis
+        .style (m/TextStyle
+                .fontSize 14)))])))
    
 (defn list-view []
   (f/widget
