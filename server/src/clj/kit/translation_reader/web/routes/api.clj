@@ -112,7 +112,15 @@
             :responses {200 {:body any?}}
             :handler (fn [{{body :body} :parameters uinfo :identity}]
                        {:status 200 :body
-                        (sentences/update-sentence (:db-conn _opts) uinfo body)})}}]
+                        (sentences/update-sentence (:db-conn _opts) uinfo body)})}
+     :get {:summary "get sentences."
+           :middleware [[middleware/wrap-restricted]]
+           :parameters {:query [:map
+                                [:article_id  string?]]}
+           :responses {200 {:body any?}}
+           :handler (fn [{{{id :article_id} :query} :parameters uinfo :identity}]
+                      {:status 200 :body
+                       (sentences/get-article-sentences (:db-conn _opts) uinfo id)})}}]
    ["/article_sentences/delete"
     {:swagger {:tags ["sentences"]}
      :post {:summary "delete sentences."
