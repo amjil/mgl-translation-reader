@@ -67,3 +67,36 @@
                     nil)
        .child
        (mgl/MongolText " ᠲᠣᠬᠢᠷᠠᠭᠤᠯᠤᠯᠲᠠ")))])))
+       
+
+(defn read-menu [curr-tab-value]
+  (let [items ["Read Translation" "Read Original" "Translate"]]
+    (f/widget
+     :get {{{color .-color} .-cardTheme} m/Theme}
+     :watch [curr-tab curr-tab-value]
+     (m/Container
+      .width 40)
+     (m.ListView/builder
+      .itemCount (count items)
+      .itemBuilder
+      (fn [context i]
+        (m/Stack
+         .children
+         [(m/Positioned
+           .top 2
+           .bottom 2
+           .right 0
+           .child
+           (if (= i curr-tab)
+             (m/Container .color color
+                          .width 1)
+             (m/SizedBox)))
+          (m/GestureDetector
+           .onTap (fn []
+                    (reset! curr-tab-value i)
+                    nil)
+           .child (m/Container
+                   .padding (m.EdgeInsets/only .left 10 .right 10 .top 20 .bottom 20)
+                   .child (mgl/MongolText (nth items i)
+                                          .style (m/TextStyle .fontSize 12
+                                                              .color color))))]))))))

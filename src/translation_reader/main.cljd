@@ -9,6 +9,7 @@
    [translation-reader.screens.signup :as signup]
    [translation-reader.screens.login :as login]
    [translation-reader.screens.write :as write]
+   [translation-reader.screens.read :as read]
    [translation-reader.services.pref :as pref]
    [translation-reader.states.global :as gs]))
 
@@ -49,5 +50,7 @@
                   .routes {"/"  home/screen
                            "/login" login/screen
                            "/signup" signup/screen
-                           "/write" write/screen}
+                           "/write" write/screen
+                           "/read" read/screen
+                           }
                   .debugShowCheckedModeBanner false))))))

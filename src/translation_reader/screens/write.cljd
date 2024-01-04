@@ -1,20 +1,83 @@
 (ns translation-reader.screens.write
   (:require
    ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]
    [cljd.flutter :as f]
    [translation-reader.widgets.menu :as menu]
+   [translation-reader.services.article :as article-service]
    [translation-reader.states.global :as gs]))
    
 (defn ^m/Widget screen [ctx]
   (f/widget
-   :get {{{primary-color .-primary} .-colorScheme} m/Theme}
+   :get {{{primary-color .-primary} .-colorScheme} m/Theme
+         navigator m/Navigator}
+   :managed [url-controller (m/TextEditingController)
+             lang-controller (m/TextEditingController)
+             content-controller (m/TextEditingController)]
    (m/Scaffold)
    .body
    (m/Padding
     .padding (m.EdgeInsets/only .top 40))
+   (m/SingleChildScrollView
+    .scrollDirection m.Axis/horizontal)
    (m/Row
+    .crossAxisAlignment m.CrossAxisAlignment/start
     .children
     [(menu/view)
      (m/VerticalDivider
       .color primary-color)
-     ])))
+     (m/SizedBox .width 10)
+     (mgl/MongolText "URL")
+     (m/SizedBox .width 10)
+     (mgl/MongolTextField
+      .controller url-controller
+      .decoration (m/InputDecoration
+                   .isDense true
+                   .border (m/OutlineInputBorder
+                            .borderSide (m/BorderSide
+                                         .width 0.2)
+                            .borderRadius (.circular m/BorderRadius 4)))
+      .maxLines 1
+      .style (m/TextStyle .fontSize 12))
+     (m/SizedBox .width 10)
+     (mgl/MongolText "Original Language")
+     (m/SizedBox .width 10)
+     (mgl/MongolTextField
+      .controller lang-controller
+      .decoration (m/InputDecoration
+                   .isDense true
+                   .border (m/OutlineInputBorder
+                            .borderSide (m/BorderSide
+                                         .width 0.2)
+                            .borderRadius (.circular m/BorderRadius 4)))
+      .maxLines 1
+      .style (m/TextStyle .fontSize 12))
+     (m/SizedBox .width 10)
+     (mgl/MongolText "Content")
+     (m/SizedBox .width 10)
+     (mgl/MongolTextField
+      .controller content-controller
+      .decoration (m/InputDecoration
+                   .isDense true
+                   .border (m/OutlineInputBorder
+                            .borderSide (m/BorderSide
+                                         .width 0.2)
+                            .borderRadius (.circular m/BorderRadius 4)))
+      .maxLines nil
+      .minLines 3
+      .style (m/TextStyle .fontSize 12))
+     (m/SizedBox .width 10)
+     (m/InkWell
+      .onTap (fn [] 
+               (article-service/create-article
+                ctx navigator
+                {"original_content" (.-text content-controller)
+                 "original_lang" (.-text lang-controller)
+                 "original_url" (.-text url-controller)})
+               nil)
+      .child (m/Chip
+              .label
+              (mgl/MongolText "Commit"
+                              .style (m/TextStyle
+                                      .fontSize 12))
+              .labelPadding (.symmetric m/EdgeInsets .horizontal 2 .vertical 20)))])))

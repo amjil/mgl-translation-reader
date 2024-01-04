@@ -1,0 +1,44 @@
+(ns translation-reader.screens.read
+  (:require
+   ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]
+   [cljd.flutter :as f]
+   
+   [translation-reader.states.global :as gs]
+   [translation-reader.widgets.menu :as menu]))
+   
+(defn ^m/Widget screen [ctx]
+  (let [curr-tab-value (atom 0)]
+    (f/widget
+     :get {{{primary-color .-primary} .-colorScheme} m/Theme
+           navigator m/Navigator}
+     :watch [{article :article} gs/state
+             curr-tab curr-tab-value]
+     (m/Scaffold)
+     .body
+     (m/Padding
+      .padding (m.EdgeInsets/only .top 40))
+     (m/Row
+      .crossAxisAlignment m.CrossAxisAlignment/start
+      .children
+      [(m/Column
+        .children
+        [(m/IconButton
+          .onPressed (fn [] (.pop navigator))
+          .icon (m/Icon m.Icons/keyboard_backspace
+                        .size 14))
+         (mgl/MongolText "READING")])
+       (m/VerticalDivider .color primary-color)
+       (menu/read-menu curr-tab-value)
+       (m/Expanded 
+        .child
+       (m/SingleChildScrollView
+        .scrollDirection m.Axis/horizontal
+        .child
+        (condp = curr-tab
+          0 (mgl/MongolText (str "" (get article "content")))
+
+          1 (mgl/MongolText (str "" (get article "original_content")))
+
+          2 (m/Text "abc"))))]))))
+

@@ -64,7 +64,8 @@
                              (swap! gs/state
                                     assoc
                                     :article
-                                    (into {} x)))}))
+                                    x)
+                             true)}))
 
 (defn create-article [ctx ^widgets/NavigatorState navigator info]
   (common/post ctx
@@ -75,7 +76,8 @@
                 :success-fn (fn [_]
                               (util/show-toast ctx "Created Success!")
                               (.popUntil navigator (widgets.ModalRoute/withName "/"))
-                              (article-list ctx navigator nil))}))
+                              (article-list ctx navigator nil)
+                              (swap! gs/state assoc :menu-index "read"))}))
 
 (defn update-article [ctx ^widgets/NavigatorState navigator id info]
   (common/post ctx
