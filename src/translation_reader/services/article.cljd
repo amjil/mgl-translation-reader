@@ -99,6 +99,17 @@
                                 (util/show-toast ctx "Created Success!")
                                 (.popUntil navigator (widgets.ModalRoute/withName "/"))
                                 (article-list ctx navigator nil))}))
+                              
+(defn my-sentences-translations [ctx ^widgets/NavigatorState navigator id]
+  (common/get ctx 
+              navigator
+              {:token true 
+               :url "/api/article_sentences"
+               :info {"article_id" id}
+               :success-fn (fn [x] 
+                             (swap! gs/state assoc :sentences
+                                    (doall
+                                     (map #(into {} %) x))))}))
 
 (defn initiate-sentences [ctx ^widgets/NavigatorState navigator id]
   (common/post ctx
@@ -107,7 +118,16 @@
                 :url "/api/article_sentences/initiate"
                 :info {"article_id" id}
                 :success-fn (fn [_]
-                              (util/show-toast ctx "Success!"))}))
+                              (my-sentences-translations ctx navigator id))}))
+                              
+(defn update-sentence [ctx ^widgets/NavigatorState navigator info]
+  (common/post ctx
+               navigator
+               {:token true
+                :url "/api/article_sentences"
+                :info info
+                :success-fn (fn [_]
+                              (my-sentences-translations ctx navigator (get info "article_id")))}))
 
 (defn delete-sentences [ctx ^widgets/NavigatorState navigator id]
   (common/post ctx

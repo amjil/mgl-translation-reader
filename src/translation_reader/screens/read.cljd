@@ -5,7 +5,8 @@
    [cljd.flutter :as f]
    
    [translation-reader.states.global :as gs]
-   [translation-reader.widgets.menu :as menu]))
+   [translation-reader.widgets.menu :as menu]
+   [translation-reader.widgets.translate :as translate]))
    
 (defn ^m/Widget screen [ctx]
   (let [curr-tab-value (atom 0)]
@@ -32,13 +33,16 @@
        (menu/read-menu curr-tab-value)
        (m/Expanded 
         .child
-       (m/SingleChildScrollView
-        .scrollDirection m.Axis/horizontal
-        .child
         (condp = curr-tab
-          0 (mgl/MongolText (str "" (get article "content")))
+          0 (m/SingleChildScrollView
+             .scrollDirection m.Axis/horizontal
+             .child
+             (mgl/MongolText (str "" (get article "content"))))
 
-          1 (mgl/MongolText (str "" (get article "original_content")))
+          1 (m/SingleChildScrollView
+             .scrollDirection m.Axis/horizontal
+             .child
+             (mgl/MongolText (str "" (get article "original_content"))))
 
-          2 (m/Text "abc"))))]))))
+          2 (translate/view)))]))))
 

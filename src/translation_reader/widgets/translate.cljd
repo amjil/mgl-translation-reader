@@ -1,0 +1,73 @@
+(ns translation-reader.widgets.translate
+  (:require
+   ["package:flutter/material.dart" :as m]
+   ["package:mongol/mongol.dart" :as mgl]
+   [cljd.flutter :as f]
+   [translation-reader.states.global :as gs]
+   [translation-reader.services.article :as article-service]
+   [translation-reader.widgets.menu-buttons :as menu-buttons]
+   [translation-reader.utils.util :as util]))
+
+(defn list-item [controller i item]
+  (f/widget
+   :context ctx
+   :get {navigator m/Navigator}
+   :watch [{current :sentences-index} gs/state]
+   (m/GestureDetector
+    .onTap (fn [] 
+             (set! (.-text controller)
+                   (if (empty? (get item "content"))
+                     (str "" (get item "original_content"))
+                     (str "" (get item "content"))))
+             (swap! gs/state assoc :sentences-index i)))
+   (if (= i current)
+     (mgl/MongolTextField
+      .controller controller
+      .maxLines nil
+      .onChanged (fn [text]
+                   (article-service/update-sentence
+                    ctx navigator
+                    {"article_id" (get item "article_id")
+                     "serial_number" i
+                     "content" text})
+                   (dart:core/print "xxxx--------"))
+      .decoration (m/InputDecoration
+                   .isDense true
+                   .border (m/OutlineInputBorder
+                            .borderSide (m/BorderSide
+                                         .width 0.2)
+                            .borderRadius (.circular m/BorderRadius 4))))
+     (mgl/MongolText
+      (if (empty? (get item "content"))
+        (str "" (get item "original_content"))
+        (str "" (get item "content")))
+      .softWrap true
+      .style (m/TextStyle
+              .fontSize 14)))))
+
+(defn view []
+  (f/widget
+   :watch [{sentences :sentences} gs/state]
+   :managed [controller (m/TextEditingController)]
+   (m/Row
+    .crossAxisAlignment m.CrossAxisAlignment/start
+    .children
+    [(m/Expanded
+      .child (m.ListView/separated
+              .scrollDirection m.Axis/horizontal
+              .separatorBuilder (fn [context i]
+                                  (m/SizedBox .width 10))
+              .itemCount (count sentences)
+              .itemBuilder (fn [context i]
+                             (list-item controller i (nth sentences i)))
+              .shrinkWrap true))
+     (m/SizedBox .width 10)
+     (m/InkWell
+      .onTap (fn []
+               nil)
+      .child (m/Chip
+              .label
+              (mgl/MongolText "Commit"
+                              .style (m/TextStyle
+                                      .fontSize 12))
+              .labelPadding (.symmetric m/EdgeInsets .horizontal 2 .vertical 20)))])))

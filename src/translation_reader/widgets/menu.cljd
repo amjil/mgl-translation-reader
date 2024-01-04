@@ -5,7 +5,8 @@
    [cljd.flutter :as f]
    [translation-reader.states.global :as gs]
    [translation-reader.widgets.menu-buttons :as menu-buttons]
-   [translation-reader.utils.util :as util]))
+   [translation-reader.utils.util :as util]
+   [translation-reader.services.article :as article-service]))
    
 (defn view []
   (f/widget
@@ -72,7 +73,9 @@
 (defn read-menu [curr-tab-value]
   (let [items ["Read Translation" "Read Original" "Translate"]]
     (f/widget
-     :get {{{color .-color} .-cardTheme} m/Theme}
+     :context ctx
+     :get {{{color .-color} .-cardTheme} m/Theme
+           navigator m/Navigator}
      :watch [curr-tab curr-tab-value]
      (m/Container
       .width 40)
@@ -94,6 +97,9 @@
           (m/GestureDetector
            .onTap (fn []
                     (reset! curr-tab-value i)
+                    (when (and (= i 2)
+                               (not-empty (:article @gs/state)))
+                      (article-service/initiate-sentences ctx navigator (get (:article @gs/state) "id")))
                     nil)
            .child (m/Container
                    .padding (m.EdgeInsets/only .left 10 .right 10 .top 20 .bottom 20)
