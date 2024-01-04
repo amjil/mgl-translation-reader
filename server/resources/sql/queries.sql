@@ -6,8 +6,12 @@ select
     a.id,
     a.original_lang,
     case when length(a.original_content) > 200
-        then substring(a.original_content, 200) 
+        then substring(a.original_content, 0,  200) 
         else a.original_content 
+        end as original_content,
+    case when length(a.content) > 200
+        then substring(a.content, 0,  200) 
+        else a.content 
         end as content,
     a.original_url,
     a.created_at,
